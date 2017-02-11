@@ -40,7 +40,7 @@ var roundedDollar = roundedAmount;
 
 
 /*
-  set a the `amount` value for each object in bankBalances
+  set the `amount` value for each object in bankBalances
   to the value of `amount` rounded to the nearest 10 cents
   example 
     {
@@ -51,10 +51,20 @@ var roundedDollar = roundedAmount;
 */
 
 
-var roundedDime = null;
+var roundedDime = bankBalances.map(function(element, index, array){
+  return {
+    amount: (Math.round(element.amount*10)/10),
+    state: element.state
+  };
+});
 
 // set sumOfBankBalances to the sum of all amounts in bankBalances
-var sumOfBankBalances = null;
+var sumOfBankBalances = bankBalances.reduce(function(prev,curr, index, array){
+  // console.log('summ', parseInt(prev) + parseInt(curr.amount));
+
+  return (Math.round((parseFloat(prev) + parseFloat(curr.amount))*100)/100);
+
+},0);
 
 /*
   set sumOfInterests to the sum of the 18.9% interest
@@ -68,7 +78,17 @@ var sumOfBankBalances = null;
     Delaware
   the result should be rounded to the nearest cent
  */
-var sumOfInterests = null;
+ //map for new interest, sum/ filter/ reduce
+var sumOfInterests = bankBalances.filter(function(element,index,array){
+  if(element.state == "WI" || element.state == "IL" || element.state == "WY" || element.state == "OH" || element.state == "GA" || element.state == "DE"){
+    return true;
+  }else{
+  return false;
+  }
+}).reduce(function(prev, curr, index, array){
+  return (Math.round((parseFloat(prev) + parseFloat(curr.amount)*0.189)*100)/100);
+},0);
+
 
 /*
   set sumOfHighInterests to the sum of the 18.9% interest
@@ -84,7 +104,10 @@ var sumOfInterests = null;
     Delaware
   the result should be rounded to the nearest cent
  */
-var sumOfHighInterests = null;
+
+var sumOfHighInterests = bankBalances.filter(function(element, index){
+    
+});
 
 /*
   aggregate the sum of bankBalance amounts
