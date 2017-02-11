@@ -89,6 +89,27 @@ var sumOfInterests = bankBalances.filter(function(element,index,array){
   return (Math.round((parseFloat(prev) + parseFloat(curr.amount)*0.189)*100)/100);
 },0);
 
+/*
+  aggregate the sum of bankBalance amounts
+  grouped by state
+  set stateSums to be a hash table
+    where the key is the two letter state abbreviation
+    and the value is the sum of all amounts from that state
+      the value must be rounded to the nearest cent
+ */
+
+var stateSums = dataset.bankBalance.reduce((accounts, currentAccount)=>{
+  if(!accounts.hasOwnProperty( currentAccount.state )){
+    accounts[ currentAccount.state ] = 0;
+  }
+  accounts[ currentAccount.state ] += parseFloat(currentAccount.amount);
+
+  accounts[ currentAccount.state ] = Math.round(accounts[ currentAccount.state] * 100)/100;
+
+  return accounts;
+
+}, {});
+
 
 /*
   set sumOfHighInterests to the sum of the 18.9% interest
@@ -105,19 +126,30 @@ var sumOfInterests = bankBalances.filter(function(element,index,array){
   the result should be rounded to the nearest cent
  */
 
-var sumOfHighInterests = bankBalances.filter(function(element, index){
-    
-});
+var sumOfHighInterests = Object.keys(stateSums)
+  //filter out states
+  .filter((state) => ['WI', 
+  'IL','WY','OH','GA','DE'].indexOf(state) === -1)
 
-/*
-  aggregate the sum of bankBalance amounts
-  grouped by state
-  set stateSums to be a hash table
-    where the key is the two letter state abbreviation
-    and the value is the sum of all amounts from that state
-      the value must be rounded to the nearest cent
- */
-var stateSums = null;
+  //convert amount to be the interest
+  .map((state)=>{
+    return {
+      state,
+      interest: Math.round(stateSums[state]*18.9)/100,
+    };
+  })
+  //filter only interests that amount to over 50k
+  .filter((account)=>{
+    return account.interest > 50000;
+  })
+  //sum all filtered interests to one lump sum
+  .reduce((prevInterest, currentInterest)=>{
+    return Math.round((prevInterest + currentInterest)*100)/100;
+  },0);
+
+
+
+
 
 /*
   set lowerSumStates to an array containing
